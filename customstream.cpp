@@ -9,24 +9,25 @@ CustomStream::CustomStream(string filename, char* search, char* replace): fs(fil
   internally_hit_eof = false;
   sz_difference = 0;
   partial_match = 0;
-  cout << search << replace << endl;
+  //cout << search << replace << endl;
 }
 
 CustomStream& CustomStream::get(char& ch)
 {
-  if(partial_match)
+  if(partial_match > 0)
   {
     ch = deck.front();
     deck.pop_front();
-    cout << "getting from deck: " << ch << endl;
+    //cout << "getting from deckP: " << ch << endl;
+    //cout << "deck size: " << deck.size() << endl;
     partial_match--;
     return *this;
   }
-  if(deck.size() > 0)
+  else if(deck.size() > 0)
   {
     ch = deck.front();
     deck.pop_front();
-    cout << "getting from deck: " << ch << endl;
+    //cout << "getting from deckR: " << ch << endl;
 
     char ch2;
     fs.seekg(get_pos);
@@ -36,7 +37,7 @@ CustomStream& CustomStream::get(char& ch)
     if(fs.eof())
     {
 
-      cout << "set eof" << endl;
+      //cout << "set eof" << endl;
       internally_hit_eof = true;
       fs.clear();
 
@@ -44,14 +45,14 @@ CustomStream& CustomStream::get(char& ch)
       {
         fs.seekp(put_pos);
         fs.put(ch);
-        cout << "---PUTTING LAST character on deck: " << ch << endl;
+        //cout << "---PUTTING LAST character on deck: " << ch << endl;
         put_pos = fs.tellp();
-        cout << "put_pos: " << put_pos << endl;
+        //cout << "put_pos: " << put_pos << endl;
       }
       return *this;
     }
     deck.push_back(ch2);
-    cout << "placing on deck: " << ch2 << endl;
+    //cout << "placing on deck: " << ch2 << endl;
     sz_difference--;
     
   }
@@ -59,16 +60,16 @@ CustomStream& CustomStream::get(char& ch)
   {
     fs.seekg(get_pos);
     fs.get(ch);
-    cout << "getting from file: " << ch << endl;
+    //cout << "getting from file: " << ch << endl;
     get_pos = fs.tellg();
-    cout << "get_pos: " << get_pos << endl;
+    //cout << "get_pos: " << get_pos << endl;
 
     //cout << "put_pos " << put_pos << endl;
     //cout << "get_pos " << get_pos << endl;
 
     if(fs.eof())
     {
-      cout << "set eof" << endl;
+      //cout << "set eof" << endl;
       internally_hit_eof = true;
       fs.clear();
     }
@@ -80,9 +81,9 @@ void CustomStream::put(char& ch)
 {
   fs.seekp(put_pos);
   fs.put(ch);
-  cout << "-------PUTTING from main: " << ch << endl;
+  //cout << "-------PUTTING from main: " << ch << endl;
   put_pos = fs.tellp();
-  cout << "put_pos: " << put_pos << endl;
+  //cout << "put_pos: " << put_pos << endl;
 }
 
 bool CustomStream::eof() 
@@ -107,7 +108,7 @@ void CustomStream::matched_search_string()
   if(rep_sz > sea_sz)
   {
     diff = rep_sz - sea_sz;
-    cout << diff << endl;
+    //cout << diff << endl;
     sz_difference = diff;
     for(int i = 0; i < diff; i++)
     {
@@ -115,14 +116,14 @@ void CustomStream::matched_search_string()
       fs.seekg(get_pos);
       fs.get(ch2);
       get_pos = fs.tellg();
-      cout << "getting from file: " << ch2 << endl;
+      //cout << "getting from file: " << ch2 << endl;
       if(fs.eof())
       {
         internally_hit_eof = true;
         fs.clear();
         break;
       }
-      cout << "Placing on deck: " << ch2 << endl;
+      //cout << "Placing on deck: " << ch2 << endl;
       deck.push_back(ch2);
     }
   }
@@ -131,10 +132,10 @@ void CustomStream::matched_search_string()
   for(unsigned int i = 0; i < rep.length(); i++)
   {
     fs.seekp(put_pos);
-    cout << "----PUTTING from replace: " << replace[i] << endl;
+    //cout << "----PUTTING from replace: " << replace[i] << endl;
     fs.put(replace[i]);
     put_pos = fs.tellp();
-    cout << "put_pos: " << put_pos << endl;
+    //cout << "put_pos: " << put_pos << endl;
   }
 }
 
@@ -152,23 +153,23 @@ void CustomStream::found_partial_match(int count, char& ch)
     if((i != 0) && (search[i] == search[0]) && (!recursive))
     {
       recursive = true;
-      partial_match = count - i - 1;
+      partial_match = count - i + 1;
     }
     if(!recursive)
     {
       fs.seekp(put_pos);
       fs.put(search[i]);
-      cout << "-----PUTTING from search: " << search[i] << endl;
+      //cout << "-----PUTTING from search: " << search[i] << endl;
       put_pos = fs.tellp();
-      cout << "put_pos: " << put_pos << endl;
+      //cout << "put_pos: " << put_pos << endl;
     }
     else
     {
-      cout << "Placing on deck: " << search[i] << endl;
+      //cout << "Placing on deck: " << search[i] << endl;
       deck.push_back(search[i]);
     }
   }
-  cout << "Placing on deck: " << ch << endl;
+  //cout << "Placing on deck: " << ch << endl;
   deck.push_back(ch);
 }
 

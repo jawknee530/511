@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   CustomStream cs(filename, sea, rep);
   char ch;
   unsigned int match_count = 0;
-  int looper = 50;
+  int looper = 100000;
 
   while(!cs.get(ch).eof() && looper)
   {
@@ -28,12 +28,14 @@ int main(int argc, char* argv[])
 
     if(match_count == search.length())
     {
+      //cout << "MATCHED\n";
       cs.matched_search_string();
       match_count = 0;
       continue;
     }
     else if(match_count > 0)
     {
+      //cout << "PARTIAL\n";
       cs.found_partial_match(match_count, ch); //replace from search string then push front character on deque
     }
     else
